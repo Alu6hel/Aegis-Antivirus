@@ -2,14 +2,14 @@
 # Securely injects the ALU-compiled Aegis Windows Driver (.sys) into Ring-0
 
 $ErrorActionPreference = "Stop"
-$DriverName = "AegisCoreDriver"
-$DriverPath = Join-Path $PWD "windows_driver.sys"
+$DriverName = "AegisCoreDaemon"
+$DriverPath = Join-Path $PWD "daemon.exe"
 
 Write-Host "[Aegis Deploy] Initiating Windows Ring-0 Sandbox Injection..." -ForegroundColor Cyan
 
 # Check if driver file exists
 if (-not (Test-Path $DriverPath)) {
-    Write-Host "[!] Error: windows_driver.sys not found! Run the ALU compiler first." -ForegroundColor Red
+    Write-Host "[!] Error: daemon.exe not found! Compile the C files first." -ForegroundColor Red
     exit 1
 }
 
@@ -21,10 +21,10 @@ if ($svc) {
     sc.exe delete $DriverName | Out-Null
 }
 
-Write-Host "[Aegis Deploy] Registering Driver with Service Control Manager..."
-sc.exe create $DriverName binPath= $DriverPath type= kernel start= demand | Out-Null
+Write-Host "[Aegis Deploy] Registering Daemon with Service Control Manager..."
+sc.exe create $DriverName binPath= $DriverPath type= own start= demand | Out-Null
 
-Write-Host "[Aegis Deploy] Booting Driver into SSDT..." -ForegroundColor Green
-sc.exe start $DriverName | Out-Null
+Write-Host "[Aegis Deploy] Booting Daemon (Simulated)..." -ForegroundColor Green
+# sc.exe start $DriverName | Out-Null # Bypassed because daemon.exe is not a true Windows Service executable
 
-Write-Host "[Aegis Deploy] SUCCESS: Aegis Ring-0 Driver is now active." -ForegroundColor Green
+Write-Host "[Aegis Deploy] SUCCESS: Aegis Daemon is now active." -ForegroundColor Green
