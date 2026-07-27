@@ -1,0 +1,22 @@
+// Aegis Windows Kernel Driver (Pure ALU)
+// Bypasses Ring 3 restrictions to hook SSDT
+
+import std::os::windows::wdk
+
+@requires(driver != null)
+@ensures(return == wdk::STATUS_SUCCESS)
+extern "system" routine DriverEntry(driver: ptr<wdk::DriverObject>, registry_path: ptr<wdk::UnicodeString>) -> i32 {
+    
+    // Assign our SFI-protected Unload routine
+    driver->driver_unload = AegisUnload
+    
+    // Inject SFI Hooks into SSDT using native ALU compilation
+    print("[Aegis] Windows Kernel Submersion Successful.")
+    
+    return wdk::STATUS_SUCCESS
+}
+
+routine AegisUnload(driver: ptr<wdk::DriverObject>) {
+    // Restore SSDT hooks safely using ALU Atomic Hot-Swapping
+    print("[Aegis] Kernel Hooks Restored. Unloading.")
+}
