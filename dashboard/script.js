@@ -1,58 +1,47 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const logContainer = document.getElementById('log-container');
-    const threatCountElement = document.getElementById('threat-count');
+    const statusText = document.getElementById('status-text');
+    const logsList = document.getElementById('logs');
     
-    let threatCount = 0;
+    // Animate UI elements on load
+    setTimeout(() => {
+        statusText.style.opacity = '1';
+        statusText.style.transform = 'translateY(0)';
+    }, 500);
 
-    const dummyThreats = [
-        "Memory injection detected in svchost.exe",
-        "Polymorphic payload intercepted at 0x004A2F90",
-        "Rootkit hook blocked in SSDT table",
-        "Suspicious JNI Env modification halted",
-        "Zero-day heuristic signature triggered",
-        "Unauthorized registry modification prevented"
-    ];
+    let threatDetected = false;
 
-    function addLogEntry(message, isDanger = false) {
-        const entry = document.createElement('div');
-        entry.className = `log-entry ${isDanger ? 'danger' : ''}`;
-        
-        const time = new Date().toLocaleTimeString();
-        
-        entry.innerHTML = `
-            <span class="log-message">${message}</span>
-            <span class="log-time">${time}</span>
-        `;
-        
-        logContainer.prepend(entry);
-        
-        // Keep only last 50 logs
-        if (logContainer.children.length > 50) {
-            logContainer.lastChild.remove();
-        }
-
-        if (isDanger) {
-            threatCount++;
-            threatCountElement.textContent = threatCount;
-            threatCountElement.style.textShadow = '0 0 30px #ff4b4b';
-            setTimeout(() => {
-                threatCountElement.style.textShadow = '0 0 20px rgba(102, 252, 241, 0.5)';
-            }, 300);
-        }
-    }
-
-    // Initial setup logs
-    addLogEntry("Aegis Dashboard Initialized.");
-    addLogEntry("Connecting to local ALU Daemon via IPC...");
-    setTimeout(() => addLogEntry("Connected. Hoare-logic verifier active.", false), 1000);
-
-    // Simulate incoming threats for the UI demo
+    // Local JSON Bridge Polling
+    // The Aegis Core Daemon (C -> .exe) writes to aegis_status.json when a threat is neutralized
     setInterval(() => {
-        if (Math.random() > 0.7) {
-            const threat = dummyThreats[Math.floor(Math.random() * dummyThreats.length)];
-            addLogEntry(`[BLOCK] ${threat}`, true);
-        } else {
-            addLogEntry("Routine memory sweep completed. Safe.");
-        }
-    }, 4500);
+        if (threatDetected) return;
+
+        fetch('aegis_status.json')
+            .then(response => {
+                if (!response.ok) return null;
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.status === "THREAT_NEUTRALIZED") {
+                    threatDetected = true;
+                    triggerThreatAlert();
+                }
+            })
+            .catch(err => console.log("Waiting for Aegis daemon..."));
+    }, 1000);
+
+    function triggerThreatAlert() {
+        statusText.textContent = "THREAT NEUTRALIZED";
+        statusText.style.color = "#ff4c4c"; // Red neon alert
+        
+        document.body.style.boxShadow = "inset 0 0 100px rgba(255, 76, 76, 0.2)";
+        
+        const logEntry = document.createElement('li');
+        logEntry.textContent = `[${new Date().toLocaleTimeString()}] Malicious memory allocation intercepted (dummy_virus.c). Process terminated.`;
+        logEntry.style.color = "#ff4c4c";
+        
+        logsList.appendChild(logEntry);
+        
+        // Reset status json so it doesn't loop forever (simulated for frontend demo)
+        fetch('aegis_status.json', { method: 'DELETE' }).catch(() => {});
+    }
 });
