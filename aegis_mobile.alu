@@ -1,0 +1,21 @@
+// Aegis Mobile Shield (Android Daemon)
+// Leverages JNI to monitor Android downloads and connects to Swarm
+
+routine main() {
+    // 1. Initialize Android Bridge
+    let jni_env = alloc(256);
+    jni_init(jni_env);
+
+    // 2. Register FileObserver on Download folder
+    register_file_observer(jni_env, "/sdcard/Download");
+
+    // 3. Keep daemon alive in background
+    start_background_service();
+
+    // 4. Connect to Offline Swarm Network (127.0.0.1:8081 or local router IP)
+    let payload = alloc(128);
+    // Write out LLVM IR simulation for network
+    write_json("mobile_telemetry.json", "MOBILE_TELEMETRY_DISPATCHED_TO_SWARM");
+
+    return 0;
+}

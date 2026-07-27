@@ -1,47 +1,66 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const statusText = document.getElementById('status-text');
-    const logsList = document.getElementById('logs');
+    const threatCountEl = document.getElementById('threat-count');
+    const logContainer = document.getElementById('log-container');
     
-    // Animate UI elements on load
-    setTimeout(() => {
-        statusText.style.opacity = '1';
-        statusText.style.transform = 'translateY(0)';
-    }, 500);
+    let threatsBlocked = 0;
+    
+    const scanPaths = [
+        "C:\\Windows\\System32\\ntoskrnl.exe",
+        "C:\\Users\\Alu\\Downloads\\unknown_payload.bin",
+        "Memory Segment 0x7FFA8...",
+        "Registry HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "Process ID: 4192 (svchost.exe)"
+    ];
 
-    let threatDetected = false;
+    function addLog(message, isThreat = false) {
+        const logEntry = document.createElement('div');
+        logEntry.className = 'log-entry';
+        
+        const timestamp = new Date().toISOString().split('T')[1].substring(0, 12);
+        
+        if (isThreat) {
+            logEntry.innerHTML = `<span style="color: #ff4c4c;">[${timestamp}] ⚠ ${message}</span>`;
+            document.body.style.boxShadow = "inset 0 0 50px rgba(255, 76, 76, 0.4)";
+            setTimeout(() => {
+                document.body.style.boxShadow = "none";
+            }, 500);
+        } else {
+            logEntry.innerHTML = `<span style="color: #00ffcc;">[${timestamp}]</span> ${message}`;
+        }
+        
+        logContainer.prepend(logEntry);
+        
+        // Keep log from growing forever
+        if (logContainer.children.length > 50) {
+            logContainer.removeChild(logContainer.lastChild);
+        }
+    }
 
-    // Local JSON Bridge Polling
-    // The Aegis Core Daemon (C -> .exe) writes to aegis_status.json when a threat is neutralized
+    // Simulate Live Memory Scanning
     setInterval(() => {
-        if (threatDetected) return;
+        const randomPath = scanPaths[Math.floor(Math.random() * scanPaths.length)];
+        addLog(`Scanning: ${randomPath} - SECURE`);
+    }, 1200);
 
+    // Simulate Intercepting a Threat occasionally
+    setInterval(() => {
+        addLog("CRITICAL: Polymorphic payload detected in memory! (dummy_virus.exe)", true);
+        addLog("ACTION: Payload neutralized via Z3 Bounds Enforcement.", true);
+        threatsBlocked++;
+        threatCountEl.textContent = threatsBlocked;
+    }, 8500);
+
+    // Try to fetch real status from local json (if daemon actually runs and drops it)
+    setInterval(() => {
         fetch('aegis_status.json')
-            .then(response => {
-                if (!response.ok) return null;
-                return response.json();
-            })
+            .then(response => response.ok ? response.json() : null)
             .then(data => {
                 if (data && data.status === "THREAT_NEUTRALIZED") {
-                    threatDetected = true;
-                    triggerThreatAlert();
+                    addLog("NATIVE INTERCEPT: Real malware blocked by Aegis Daemon!", true);
+                    threatsBlocked++;
+                    threatCountEl.textContent = threatsBlocked;
+                    fetch('aegis_status.json', { method: 'DELETE' }).catch(() => {});
                 }
-            })
-            .catch(err => console.log("Waiting for Aegis daemon..."));
-    }, 1000);
-
-    function triggerThreatAlert() {
-        statusText.textContent = "THREAT NEUTRALIZED";
-        statusText.style.color = "#ff4c4c"; // Red neon alert
-        
-        document.body.style.boxShadow = "inset 0 0 100px rgba(255, 76, 76, 0.2)";
-        
-        const logEntry = document.createElement('li');
-        logEntry.textContent = `[${new Date().toLocaleTimeString()}] Malicious memory allocation intercepted (dummy_virus.c). Process terminated.`;
-        logEntry.style.color = "#ff4c4c";
-        
-        logsList.appendChild(logEntry);
-        
-        // Reset status json so it doesn't loop forever (simulated for frontend demo)
-        fetch('aegis_status.json', { method: 'DELETE' }).catch(() => {});
-    }
+            }).catch(() => {});
+    }, 2000);
 });

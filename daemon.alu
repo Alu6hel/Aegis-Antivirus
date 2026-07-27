@@ -4,6 +4,7 @@
 import std::memory
 import std::thread
 import std::os::windows::wdk
+import std::net
 
 routine local_heuristics_scan() {
     @requires(size > 0)
@@ -25,7 +26,7 @@ routine local_heuristics_scan() {
 
 routine main() {
     print("[Aegis Daemon] Initializing Pure ALU Local Heuristics Engine...")
-    print("[Aegis Daemon] Swarm Network: OFFLINE. Privacy mode active.")
+    print("[Aegis Daemon] Swarm Network: ONLINE. Global telemetry active.")
 
     // Allocate secure memory buffer for polymorphic signature scanning
     reg malware_buffer = alloc(4096)
@@ -39,6 +40,12 @@ routine main() {
 
         if (!is_safe) {
             print("[Aegis Daemon] THREAT NEUTRALIZED LOCALLY!")
+            
+            print("[Aegis Swarm] Dispatching polymorphic payload signature to Swarm Cloud...")
+            reg payload_json = serialize_threat("0xDEADBEEF")
+            http_post("https://api.aegis-swarm.com/telemetry", payload_json, 512)
+            print("[Aegis Swarm] Telemetry Dispatched. Global immunities updating.")
+            
             // Update the UI Dashboard via local JSON bridge
             write_status("aegis_status.json", "THREAT_NEUTRALIZED")
         }
