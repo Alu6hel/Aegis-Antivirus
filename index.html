@@ -4,74 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aegis Antivirus | The Decentralized Immune System</title>
+    <!-- Modern Sans-Serif Font (Inter) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Navigation Bar -->
     <nav class="navbar">
-        <div class="logo">Aegis AI</div>
-        <ul class="nav-links">
-            <li><a href="#swarm">Kybalion Swarm</a></li>
-            <li><a href="#radar">Holographic Radar</a></li>
-            <li><a href="#hypervisor">Ring-0 Hypervisor</a></li>
-        </ul>
-    </nav>
-
-    <header class="hero">
-        <div class="hero-content">
-            <h1 class="glitch" data-text="THE DECENTRALIZED IMMUNE SYSTEM">THE DECENTRALIZED IMMUNE SYSTEM</h1>
-            <p>Powered by the ALU Programming Language. Mathematically unhackable. Infinitely scalable.</p>
-            <div class="cta-buttons">
-                <a href="https://github.com/Alu6hel/Aegis-Antivirus/releases/latest/download/aegis_production.exe" class="btn primary">Download for Windows</a>
-                <a href="https://github.com/Alu6hel/Aegis-Antivirus/releases/latest/download/aegis_mobile.apk" class="btn secondary">Download for Android</a>
+        <div class="nav-container">
+            <div class="logo">Aegis</div>
+            <div class="nav-links">
+                <a href="#">Products</a>
+                <a href="#">Solutions</a>
+                <a href="#">Developers</a>
+                <a href="#">Resources</a>
+                <a href="#" class="nav-cta">Sign in</a>
             </div>
         </div>
-        <!-- Mascot Section -->
-        <div class="mascot-container" id="watchdog-trigger" style="cursor: pointer;">
-            <img src="dog_mascot.jpg" alt="Suspicious Dog Mascot - Guarding your PC" class="mascot-img" onerror="this.src='https://placekitten.com/400/400'">
-            <div class="mascot-label" id="watchdog-label">System Watchdog Active<br><span style="font-size: 0.7rem; color: #aaa;">(Click Mascot to Test Audio)</span></div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1>The decentralized<br>immune system.</h1>
+                <p class="hero-subtitle">Aegis is a Ring-0 hypervisor powered by a global peer-to-peer threat database. We isolate zero-day vulnerabilities in milliseconds, keeping your infrastructure secure.</p>
+                <div class="hero-buttons">
+                    <a href="https://github.com/Alu6hel/Aegis-Antivirus/releases/latest/download/aegis_production.exe" class="btn btn-primary">Download for Windows</a>
+                    <a href="https://github.com/Alu6hel/Aegis-Antivirus/releases/latest/download/aegis_mobile.apk" class="btn btn-secondary">Download for Android</a>
+                </div>
+            </div>
+            
+            <div class="hero-graphics">
+                <div class="mascot-card" id="watchdog-trigger">
+                    <div class="mascot-header">
+                        <span class="status-dot"></span> System Watchdog Active
+                    </div>
+                    <!-- Mascot Image (Click to trigger audio) -->
+                    <img src="dog_mascot.png" alt="Suspicious Dog Mascot" class="mascot-img">
+                    <div class="mascot-footer" id="watchdog-label">
+                        <span class="footer-hint">Click image to test audio system</span>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <!-- Audio Element -->
-        <audio id="dog-bark-audio" src="dog_bark.mp3" preload="auto"></audio>
     </header>
 
-    <section id="swarm" class="feature-section">
-        <div class="feature-card glass">
-            <h2>The Kybalion DHT Swarm</h2>
-            <p>Every Aegis node is connected via a Kademlia Distributed Hash Table. When one PC on Earth detects a zero-day virus, it broadcasts the 128-D AI behavior vector globally. The entire planet is immunized in milliseconds.</p>
+    <!-- Features Section -->
+    <section class="features">
+        <div class="features-container">
+            <div class="feature-item">
+                <div class="feature-icon icon-blue"></div>
+                <h3>Ring-0 Hypervisor</h3>
+                <p>Operates at the deepest kernel level, preventing rootkits before they can inject.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon icon-purple"></div>
+                <h3>Decentralized Swarm</h3>
+                <p>Threat signatures are distributed globally via the Kybalion P2P DHT network.</p>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon icon-green"></div>
+                <h3>128-D Neural AI</h3>
+                <p>Advanced vector heuristics classify entirely new mutations of malware instantly.</p>
+            </div>
         </div>
     </section>
 
-    <section id="radar" class="feature-section reverse">
-        <div class="feature-card glass">
-            <h2>The 3D Holographic Radar</h2>
-            <p>Powered by the Nonlocality Graphics Engine, Aegis features a hardware-accelerated 3D UI. Watch glowing neural vectors map your system in real-time, isolating threats with photorealistic raytracing.</p>
-        </div>
-    </section>
+    <!-- Audio Element -->
+    <audio id="dog-bark-audio" src="dog_bark.mp3" preload="auto"></audio>
 
-    <footer class="footer">
-        <p>Copyright &copy; 2026 [David A. Jones / Alugandr Co.]. All rights reserved.</p>
-        <p class="built-with">Built with pure ALU Language architecture.</p>
-    </footer>
-
+    <!-- Interactive Script -->
     <script>
         const trigger = document.getElementById('watchdog-trigger');
-        const audio = document.getElementById('dog-bark-audio');
         const label = document.getElementById('watchdog-label');
+        const audio = document.getElementById('dog-bark-audio');
 
         function triggerWatchdog() {
-            // Play bark sound
+            // Play Audio
             audio.currentTime = 0;
             audio.play().catch(e => console.log("Audio play blocked by browser policy until interaction."));
-            
-            // Trigger visual alert
-            label.classList.add('alert-active');
-            trigger.querySelector('.mascot-img').classList.add('alert-shake');
+
+            // Visual Shake & Red Alert Effect
+            trigger.classList.add('shake-alert');
+            label.innerHTML = "<span style='color: #ff3366; font-weight: 700;'>THREAT DETECTED! ISOLATING...</span>";
             
             setTimeout(() => {
-                label.classList.remove('alert-active');
-                trigger.querySelector('.mascot-img').classList.remove('alert-shake');
+                trigger.classList.remove('shake-alert');
+                label.innerHTML = "<span class='footer-hint'>Click image to test audio system</span>";
             }, 1000);
         }
 
