@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.22.1)
+project("aegis_jni")
+add_library(aegis_jni SHARED aegis_jni.cpp)
+find_library(log-lib log)
+target_link_libraries(aegis_jni ${log-lib})
