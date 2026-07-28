@@ -1,0 +1,33 @@
+name: Aegis CI/CD Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Install LLVM-MinGW Toolchain
+        run: |
+          Invoke-WebRequest -Uri "https://github.com/mstorsjo/llvm-mingw/releases/download/20230614/llvm-mingw-20230614-ucrt-x86_64.zip" -OutFile "llvm-mingw.zip"
+          Expand-Archive llvm-mingw.zip -DestinationPath .
+          echo "$PWD/llvm-mingw-20230614-ucrt-x86_64/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Compile Aegis Windows GUI & Metadata
+        run: |
+          windres aegis_metadata.rc -o aegis_metadata.res
+          g++ daemon.cpp aegis_metadata.res -o aegis_production.exe -O3 -mwindows
+
+      - name: Update GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload latest aegis_production.exe --clobber

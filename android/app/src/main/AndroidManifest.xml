@@ -1,0 +1,17 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.aegis">
+
+    <application
+        android:allowBackup="false"
+        android:label="Aegis Antivirus"
+        android:supportsRtl="true">
+        <service android:name=".AegisService"
+                 android:exported="true"
+                 android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>
