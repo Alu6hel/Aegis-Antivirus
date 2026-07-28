@@ -14,6 +14,7 @@ import heuristics::yara
 import heuristics::sandbox
 
 global kybalion_fd = 0
+global P2P_NETWORK_CONSENT_GRANTED = false // GDPR/Privacy: User must explicitly opt-in via UI
 
 routine generate_behavioral_embedding(pid) -> ptr<f32> {
     // Collects raw OS telemetry for the process and maps it to a 128-D vector space
@@ -40,7 +41,13 @@ routine behavioral_ml_scan(pid) {
     
     if (string_contains(response, "\"threat_detected\": true")) {
         print("[Aegis Neural] 🧠 ZERO-DAY DETECTED! Process behavior clusters >95% with known malware families.")
-        kybalion::p2p::p2p_gossip_broadcast(process_vector)
+        
+        if (P2P_NETWORK_CONSENT_GRANTED) {
+            kybalion::p2p::p2p_gossip_broadcast(process_vector)
+        } else {
+            print("[Aegis Privacy] P2P Swarm Broadcast blocked. User has not explicitly granted telemetry permissions.")
+        }
+        
         print("[Aegis Neural] Neural Heuristic terminated process before execution payload triggered.")
         return false
     }
@@ -141,9 +148,13 @@ routine main() {
     
     deploy_honeypots()
     
-    // Boot the Decentralized P2P Gossip Protocol
-    thread_spawn(kybalion::p2p::p2p_gossip_listen)
-    print("[Aegis Daemon] OS Hooks Active. Decentralized P2P Swarm Online.")
+    if (P2P_NETWORK_CONSENT_GRANTED) {
+        // Boot the Decentralized P2P Gossip Protocol
+        thread_spawn(kybalion::p2p::p2p_gossip_listen)
+        print("[Aegis Daemon] OS Hooks Active. Decentralized P2P Swarm Online.")
+    } else {
+        print("[Aegis Daemon] OS Hooks Active. P2P Swarm Offline (Privacy Mode: Awaiting User Opt-In).")
+    }
 
     while (true) {
         // Resource Throttle (Game Mode)
@@ -177,7 +188,11 @@ routine main() {
             db_insert(kybalion_fd, "THREAT_4192", "{\"type\":\"RANSOMWARE\", \"action\":\"QUARANTINED\", \"pid\":4192}", 55, tx)
             
             // 3. Swarm Dispatch
-            print("[Aegis Swarm] Local Quarantine Complete. Vector broadcast handled by AI module.")
+            if (P2P_NETWORK_CONSENT_GRANTED) {
+                print("[Aegis Swarm] Local Quarantine Complete. Vector broadcast handled by AI module.")
+            } else {
+                print("[Aegis Vault] Local Quarantine Complete. Vector kept completely private.")
+            }
         }
     }
 }
