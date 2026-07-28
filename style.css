@@ -1,0 +1,198 @@
+/* Aegis Antivirus Landing Page Styles */
+
+:root {
+    --bg-dark: #0a0a0f;
+    --neon-blue: #00f3ff;
+    --neon-red: #ff003c;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    color: #fff;
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 5%;
+    position: absolute;
+    width: 100%;
+    z-index: 10;
+}
+
+.logo {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--neon-blue);
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-links a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: var(--neon-blue);
+}
+
+/* Hero Section */
+.hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10%;
+    background: radial-gradient(circle at center, #1a1a24 0%, var(--bg-dark) 100%);
+    position: relative;
+}
+
+.hero-content {
+    max-width: 600px;
+    z-index: 2;
+}
+
+.glitch {
+    font-family: 'Outfit', sans-serif;
+    font-size: 4rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.hero-content p {
+    font-size: 1.1rem;
+    color: #888;
+    margin-bottom: 2.5rem;
+}
+
+.cta-buttons {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.btn {
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.btn.primary {
+    background: var(--neon-blue);
+    color: #000;
+    box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+}
+
+.btn.primary:hover {
+    box-shadow: 0 0 30px rgba(0, 243, 255, 0.8);
+    transform: translateY(-2px);
+}
+
+.btn.secondary {
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn.secondary:hover {
+    border-color: #fff;
+}
+
+/* Mascot Section */
+.mascot-container {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+}
+
+.mascot-img {
+    width: 350px;
+    height: 350px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--neon-blue);
+    box-shadow: 0 0 40px rgba(0, 243, 255, 0.2);
+    animation: pulse 4s infinite alternate;
+}
+
+.mascot-label {
+    margin-top: 1rem;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    color: var(--neon-red);
+    text-shadow: 0 0 10px rgba(255, 0, 60, 0.5);
+    text-transform: uppercase;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 20px rgba(0, 243, 255, 0.2); }
+    100% { box-shadow: 0 0 60px rgba(0, 243, 255, 0.6); }
+}
+
+/* Features */
+.feature-section {
+    padding: 6rem 10%;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.feature-section.reverse {
+    justify-content: flex-end;
+}
+
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    padding: 3rem;
+    border-radius: 16px;
+    max-width: 500px;
+}
+
+.glass h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--neon-blue);
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    padding: 3rem 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.built-with {
+    margin-top: 0.5rem;
+    color: #444;
+}
