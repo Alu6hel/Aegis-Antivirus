@@ -22,15 +22,18 @@
             <h1 class="glitch" data-text="THE DECENTRALIZED IMMUNE SYSTEM">THE DECENTRALIZED IMMUNE SYSTEM</h1>
             <p>Powered by the ALU Programming Language. Mathematically unhackable. Infinitely scalable.</p>
             <div class="cta-buttons">
-                <a href="#" class="btn primary">Download for Windows</a>
-                <a href="#" class="btn secondary">Download for Android</a>
+                <a href="https://github.com/Alu6hel/Aegis-Antivirus/releases/latest/download/aegis_production.exe" class="btn primary">Download for Windows</a>
+                <a href="https://github.com/Alu6hel/Aegis-Antivirus/releases/latest/download/aegis_mobile.apk" class="btn secondary">Download for Android</a>
             </div>
         </div>
         <!-- Mascot Section -->
-        <div class="mascot-container">
+        <div class="mascot-container" id="watchdog-trigger">
             <img src="dog_mascot.jpg" alt="Suspicious Dog Mascot - Guarding your PC" class="mascot-img" onerror="this.src='https://placekitten.com/400/400'">
-            <div class="mascot-label">System Watchdog Active</div>
+            <div class="mascot-label" id="watchdog-label">System Watchdog Active</div>
         </div>
+        
+        <!-- Audio Element -->
+        <audio id="dog-bark-audio" src="dog_bark.mp3" preload="auto"></audio>
     </header>
 
     <section id="swarm" class="feature-section">
@@ -51,5 +54,30 @@
         <p>Copyright &copy; 2026 [David A. Jones / Alugandr Co.]. All rights reserved.</p>
         <p class="built-with">Built with pure ALU Language architecture.</p>
     </footer>
+
+    <script>
+        const trigger = document.getElementById('watchdog-trigger');
+        const audio = document.getElementById('dog-bark-audio');
+        const label = document.getElementById('watchdog-label');
+
+        function triggerWatchdog() {
+            // Play bark sound
+            audio.currentTime = 0;
+            audio.play().catch(e => console.log("Audio play blocked by browser policy until interaction."));
+            
+            // Trigger visual alert
+            label.classList.add('alert-active');
+            trigger.querySelector('.mascot-img').classList.add('alert-shake');
+            
+            setTimeout(() => {
+                label.classList.remove('alert-active');
+                trigger.querySelector('.mascot-img').classList.remove('alert-shake');
+            }, 1000);
+        }
+
+        // Bark on hover and click
+        trigger.addEventListener('mouseenter', triggerWatchdog);
+        trigger.addEventListener('click', triggerWatchdog);
+    </script>
 </body>
 </html>
