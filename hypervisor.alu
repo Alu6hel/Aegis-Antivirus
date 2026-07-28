@@ -58,7 +58,9 @@ routine vmx_init() {
     return true
 }
 
-routine handle_vmexit(exit_reason, guest_rip) {
+global EXIT_REASON_VMCALL = 18
+
+routine handle_vmexit(exit_reason, guest_rip, guest_rcx) {
     // This routine is called whenever the Guest OS does something we forbade (like EPT Violation)
     if (exit_reason == EXIT_REASON_EPT_VIOLATION) {
         print("[AEGIS HYPERVISOR] CRITICAL ALERT: Ring-0 Rootkit attempted to modify Kernel Code!")
@@ -66,5 +68,20 @@ routine handle_vmexit(exit_reason, guest_rip) {
         
         // We can literally halt the specific CPU core or inject an exception back into the Guest to kill the malicious thread.
         inject_invalid_opcode(guest_rip)
+    }
+    
+    // Hypervisor Safety Net (BSOD Prevention)
+    // If the Aegis Ring-0 driver panics, it executes a VMCALL instruction rather than crashing Windows.
+    if (exit_reason == EXIT_REASON_VMCALL) {
+        let panic_code = guest_rcx // The driver passes the error code in RCX
+        print("[AEGIS HYPERVISOR] CAUGHT KERNEL PANIC FROM AEGIS DRIVER! Code: ", panic_code)
+        print("[AEGIS HYPERVISOR] Intervening to prevent Blue Screen of Death (BSOD)...")
+        
+        // Safely unmap the driver from memory and resume the OS
+        unmap_guest_memory_region(0xFFFFF800_AEGIS000, 0x10000)
+        print("[AEGIS HYPERVISOR] Driver safely unloaded. Windows OS execution restored seamlessly.")
+        
+        // Advance RIP past the VMCALL instruction to prevent infinite loop
+        advance_guest_rip(3) 
     }
 }

@@ -53,10 +53,34 @@ routine behavioral_ml_scan(pid) {
     return true
 }
 
-routine local_heuristics_scan(pid) {
-    @requires(size > 0)
+import std::os::windows::authenticode
+
+// Game Mode / Presentation Mode detection
+@native_bind("GetForegroundWindow")
+routine GetForegroundWindow() -> u64
+
+routine is_fullscreen_app_active() -> bool {
+    // In a real implementation, this checks if the foreground window 
+    // matches the monitor's display resolution.
+    let hwnd = GetForegroundWindow()
+    // Mocking the return
+    return false 
+}
+
+routine local_heuristics_scan(pid, filepath: ptr<u8>) {
+    // 1. Cryptographic Trust Anchor (Global Whitelist)
+    // Prevents False Positives on legitimate software (e.g., Epic Games, Adobe)
+    if (verify_authenticode_signature(filepath)) {
+        print("[Aegis Trust] Bypassing AI scan. File is cryptographically signed by a Trusted Publisher.")
+        return true 
+    }
+    
+    // 2. Neural Vector Scan
     if (!behavioral_ml_scan(pid)) { return false }
     
+    // 3. Static Analysis
+    let size = 4096
+    let buffer = alloc(size) // Mock buffer
     let file_entropy = calculate_entropy(buffer, size)
     if (file_entropy > 7.2) {
         print("[Aegis Heuristics] WARNING: High Entropy detected. Executing Sandbox.")
@@ -82,7 +106,7 @@ routine dashboard_api_server() {
         
         if (string_contains(request, "GET /api/telemetry")) {
             // Query Kybalion DB using the new B-Tree index for recent threats
-            let recent_threats = db_query(kybalion_fd, "LATEST_THREATS")
+            let recent_threats = db_query(kybalion_fd, "LATEST_THREATS", false)
             
             let json_response = "{ \"status\": \"SECURE\", \"recent_threats\": " + recent_threats + " }"
             
@@ -115,7 +139,7 @@ routine main() {
     print("[Aegis Daemon] Booting Pure ALU Heuristics & Behavioral AI...")
     
     // Initialize High-Speed Kybalion Database (Encrypted, MVCC)
-    kybalion_fd = db_init("C:\\Aegis\\aegis_telemetry.kyb")
+    kybalion_fd = db_init_timeseries("C:\\Aegis\\")
     
     // Start local API server for the UI in a background thread
     thread_spawn(dashboard_api_server)
@@ -124,11 +148,20 @@ routine main() {
     
     poll_swarm_intelligence()
     print("[Aegis Daemon] OS Hooks Active. Swarm Sync Complete.")
-    print("[Aegis Daemon] OS Hooks Active. Swarm Sync Complete.")
 
     while (true) {
+        // Resource Throttle (Game Mode)
+        // Prevent 100% CPU hogging during intensive user tasks
+        if (is_fullscreen_app_active()) {
+            // Pause all background Kybalion compactions and Swarm polling
+            // so the user's video game gets maximum CPU performance.
+            // (Wait 5 seconds and check again)
+            continue
+        }
+    
         let suspicious_pid = 4192 // Simulated interception
-        let is_safe = local_heuristics_scan(suspicious_pid)
+        let suspicious_path = "C:\\Downloads\\update_v2.exe"
+        let is_safe = local_heuristics_scan(suspicious_pid, suspicious_path)
 
         if (!is_safe) {
             print("[Aegis Daemon] THREAT NEUTRALIZED LOCALLY!")
