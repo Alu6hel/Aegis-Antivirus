@@ -6,6 +6,7 @@ import std::thread
 import std::os::windows::wdk
 import std::net
 import kybalion::db // Replaced std::database with enterprise Kybalion DB
+import kybalion::p2p // Decentralized Gossip Protocol
 
 // Import heuristics engine
 import heuristics::entropy
@@ -13,13 +14,6 @@ import heuristics::yara
 import heuristics::sandbox
 
 global kybalion_fd = 0
-
-routine poll_swarm_intelligence() {
-    print("[Aegis Swarm] Polling Global Cloud for Zero-Day Signatures...")
-    let response = http_get("https://api.aegis-swarm.com/intelligence/latest")
-    // Mock updating local YARA rules dynamically
-    print("[Aegis Swarm] Downloaded 42 new Zero-Day signatures.")
-}
 
 routine generate_behavioral_embedding(pid) -> ptr<f32> {
     // Collects raw OS telemetry for the process and maps it to a 128-D vector space
@@ -46,6 +40,7 @@ routine behavioral_ml_scan(pid) {
     
     if (string_contains(response, "\"threat_detected\": true")) {
         print("[Aegis Neural] 🧠 ZERO-DAY DETECTED! Process behavior clusters >95% with known malware families.")
+        kybalion::p2p::p2p_gossip_broadcast(process_vector)
         print("[Aegis Neural] Neural Heuristic terminated process before execution payload triggered.")
         return false
     }
@@ -146,8 +141,9 @@ routine main() {
     
     deploy_honeypots()
     
-    poll_swarm_intelligence()
-    print("[Aegis Daemon] OS Hooks Active. Swarm Sync Complete.")
+    // Boot the Decentralized P2P Gossip Protocol
+    thread_spawn(kybalion::p2p::p2p_gossip_listen)
+    print("[Aegis Daemon] OS Hooks Active. Decentralized P2P Swarm Online.")
 
     while (true) {
         // Resource Throttle (Game Mode)
@@ -180,9 +176,8 @@ routine main() {
             let tx = begin_transaction()
             db_insert(kybalion_fd, "THREAT_4192", "{\"type\":\"RANSOMWARE\", \"action\":\"QUARANTINED\", \"pid\":4192}", 55, tx)
             
-            // 3. Dispatch to Swarm
-            http_post("https://api.aegis-swarm.com/telemetry", "THREAT_DATA", 11)
-            print("[Aegis Swarm] Telemetry Dispatched. Global immunities updating.")
+            // 3. Swarm Dispatch
+            print("[Aegis Swarm] Local Quarantine Complete. Vector broadcast handled by AI module.")
         }
     }
 }
