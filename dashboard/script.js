@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Modal Logic
     const quarantineModal = document.getElementById('quarantine-modal');
     const settingsModal = document.getElementById('settings-modal');
+    const whitelistModal = document.getElementById('whitelist-modal');
     
     document.getElementById('nav-quarantine').addEventListener('click', (e) => {
         e.preventDefault();
@@ -124,11 +125,37 @@ document.addEventListener('DOMContentLoaded', () => {
         settingsModal.style.display = 'block';
     });
     
+    document.getElementById('btn-open-whitelist').addEventListener('click', (e) => {
+        e.preventDefault();
+        settingsModal.style.display = 'none';
+        whitelistModal.style.display = 'block';
+    });
+    
     document.getElementById('btn-close-quarantine').addEventListener('click', () => {
         quarantineModal.style.display = 'none';
     });
     
     document.getElementById('btn-close-settings').addEventListener('click', () => {
         settingsModal.style.display = 'none';
+    });
+    
+    document.getElementById('btn-close-whitelist').addEventListener('click', () => {
+        whitelistModal.style.display = 'none';
+    });
+    
+    document.getElementById('btn-add-whitelist').addEventListener('click', () => {
+        const input = document.getElementById('whitelist-input');
+        if (input.value.trim() !== '') {
+            const ul = document.getElementById('whitelist-entries');
+            const li = document.createElement('li');
+            li.style.background = 'rgba(0,0,0,0.3)';
+            li.style.padding = '10px';
+            li.style.borderRadius = '8px';
+            li.style.marginBottom = '5px';
+            li.textContent = input.value;
+            ul.appendChild(li);
+            input.value = '';
+            addLog(`Cryptographic Whitelist: Added custom exception.`, false);
+        }
     });
 });

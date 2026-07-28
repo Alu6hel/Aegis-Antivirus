@@ -108,6 +108,43 @@
                             <span class="slider"></span>
                         </label>
                     </div>
+                    <div class="toggle-container" style="justify-content: space-between; width: 100%;">
+                        <span class="toggle-label">Neural Vector Search (AI Brain)</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-neural-ai" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-container" style="justify-content: space-between; width: 100%;">
+                        <span class="toggle-label">Resource Throttle (Game Mode)</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-game-mode" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div style="margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                        <button id="btn-open-whitelist" class="btn btn-primary" style="width: 100%;">Manage Cryptographic Whitelist</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Whitelist Modal (Hidden by default) -->
+            <section id="whitelist-modal" class="glass-panel" style="display: none; position: absolute; top: 15%; left: 25%; width: 50%; height: 70%; z-index: 105;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h3>Cryptographic Whitelist</h3>
+                    <button id="btn-close-whitelist" class="btn btn-secondary">Close</button>
+                </div>
+                <div style="padding: 20px;">
+                    <p style="color: #8b8f94; margin-bottom: 15px;">Executables with these Authenticode Signatures bypass Neural Scans:</p>
+                    <ul style="list-style: none; padding: 0; margin-bottom: 20px;" id="whitelist-entries">
+                        <li style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 5px;">Microsoft Corporation</li>
+                        <li style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 5px;">Adobe Inc.</li>
+                        <li style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 5px;">Epic Games, Inc.</li>
+                    </ul>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="whitelist-input" placeholder="Publisher Name or Path..." style="flex: 1; padding: 10px; background: rgba(0,0,0,0.5); border: 1px solid #333; color: #fff; border-radius: 5px;">
+                        <button id="btn-add-whitelist" class="btn btn-primary">Add Exception</button>
+                    </div>
                 </div>
             </section>
         </main>
