@@ -27,9 +27,9 @@
             </div>
         </div>
         <!-- Mascot Section -->
-        <div class="mascot-container" id="watchdog-trigger">
+        <div class="mascot-container" id="watchdog-trigger" style="cursor: pointer;">
             <img src="dog_mascot.jpg" alt="Suspicious Dog Mascot - Guarding your PC" class="mascot-img" onerror="this.src='https://placekitten.com/400/400'">
-            <div class="mascot-label" id="watchdog-label">System Watchdog Active</div>
+            <div class="mascot-label" id="watchdog-label">System Watchdog Active<br><span style="font-size: 0.7rem; color: #aaa;">(Click Mascot to Test Audio)</span></div>
         </div>
         
         <!-- Audio Element -->
@@ -75,8 +75,7 @@
             }, 1000);
         }
 
-        // Bark on hover and click
-        trigger.addEventListener('mouseenter', triggerWatchdog);
+        // Bark only on click to bypass browser autoplay restrictions
         trigger.addEventListener('click', triggerWatchdog);
     </script>
 </body>
