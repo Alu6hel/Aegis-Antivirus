@@ -1,0 +1,70 @@
+// Aegis Micro-Hypervisor (Ring -1 Introspection)
+// Written in Pure ALU
+// Utilizes Intel VT-x to observe the Windows OS from the hardware level.
+
+import std::memory
+import std::os::hw::intel
+
+global VMXON_REGION = 0
+global VMCS_REGION = 0
+
+routine check_vtx_support() {
+    // Execute CPUID to check if VT-x is available and enabled in BIOS
+    let cpuid_result = cpu_id(1)
+    if ((cpuid_result.ecx & (1 << 5)) == 0) {
+        print("[AEGIS HYPERVISOR] Intel VT-x is NOT supported or enabled in BIOS.")
+        return false
+    }
+    return true
+}
+
+routine setup_ept() {
+    // Extended Page Tables (EPT)
+    // We map the physical memory of the guest OS (Windows) but mark critical 
+    // system structures (like the System Service Descriptor Table - SSDT) as READ-ONLY at the hardware level.
+    print("[AEGIS HYPERVISOR] Building Extended Page Tables (EPT)...")
+    
+    let ept_pointer = alloc_physical(4096)
+    
+    // Mock mapping of Guest OS physical memory
+    // If a Ring-0 Rootkit tries to overwrite the SSDT to hook system calls, 
+    // the CPU itself will throw an EPT Violation Exception (VMEXIT), catching the malware red-handed.
+    map_ept_region(ept_pointer, 0xFFFFF800_00000000, 0x1000000, EPT_READ_ONLY)
+    
+    return ept_pointer
+}
+
+routine vmx_init() {
+    print("[AEGIS HYPERVISOR] Booting Ring -1 Introspection Engine...")
+    
+    if (!check_vtx_support()) { return false }
+    
+    // Enable VMX Operation (CR4.VMXE)
+    enable_vmx_cr4()
+    
+    // Allocate VMXON and VMCS regions (Must be 4KB aligned physical memory)
+    VMXON_REGION = alloc_physical(4096)
+    VMCS_REGION = alloc_physical(4096)
+    
+    let ept_ptr = setup_ept()
+    
+    // Execute VMXON
+    if (execute_vmxon(VMXON_REGION) != 0) {
+        print("[AEGIS HYPERVISOR] VMXON Failed!")
+        return false
+    }
+    
+    print("[AEGIS HYPERVISOR] Ring -1 Micro-Hypervisor is ACTIVE. Windows is now isolated.")
+    return true
+}
+
+routine handle_vmexit(exit_reason, guest_rip) {
+    // This routine is called whenever the Guest OS does something we forbade (like EPT Violation)
+    if (exit_reason == EXIT_REASON_EPT_VIOLATION) {
+        print("[AEGIS HYPERVISOR] CRITICAL ALERT: Ring-0 Rootkit attempted to modify Kernel Code!")
+        print("[AEGIS HYPERVISOR] Hardware-Level Intervention Triggered at RIP: ", guest_rip)
+        
+        // We can literally halt the specific CPU core or inject an exception back into the Guest to kill the malicious thread.
+        inject_invalid_opcode(guest_rip)
+    }
+}

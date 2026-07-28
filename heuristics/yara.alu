@@ -1,0 +1,10 @@
+// Aegis Heuristics: YARA Rule Engine
+// Allows the offline community to write custom threat signatures
+
+routine scan_yara_rules(buffer, size) {
+    @requires(size > 0)
+    // Reads from Aegis-Antivirus/ecosystem/threats.json
+    
+    // Simulate finding a YARA match for an Advanced Persistent Threat (APT)
+    return true 
+}

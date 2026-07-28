@@ -21,8 +21,11 @@ body {
     height: 100vh;
     overflow: hidden;
     background-image: 
-        radial-gradient(circle at 15% 50%, rgba(69, 162, 158, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 85% 30%, rgba(102, 252, 241, 0.05) 0%, transparent 50%);
+        linear-gradient(rgba(11, 12, 16, 0.8), rgba(11, 12, 16, 0.85)),
+        url('file:///C:/Users/Alu/.gemini/antigravity-ide/brain/ecb51207-9c95-4a52-808f-9dfeabacd4a5/aegis_av_background_1785201106556.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .dashboard-container {
@@ -245,4 +248,136 @@ h2 {
 ::-webkit-scrollbar-thumb {
     background: var(--accent-teal);
     border-radius: 10px;
+}
+
+/* Action Control Panel */
+.action-panel {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.action-panel h3 {
+    font-weight: 500;
+    color: #fff;
+}
+
+.action-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-teal));
+    color: var(--bg-color);
+    box-shadow: 0 0 15px rgba(102, 252, 241, 0.4);
+}
+
+.btn-primary:hover:not(:disabled) {
+    box-shadow: 0 0 25px rgba(102, 252, 241, 0.6);
+    transform: translateY(-2px);
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.btn-danger {
+    background: rgba(255, 75, 75, 0.1);
+    color: var(--danger);
+    border: 1px solid rgba(255, 75, 75, 0.3);
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: rgba(255, 75, 75, 0.2);
+    box-shadow: 0 0 15px rgba(255, 75, 75, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Toggle Switch */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+
+.toggle-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-main);
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    transition: .4s;
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 3px;
+    background-color: #fff;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--safe);
+    border-color: var(--safe);
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
 }

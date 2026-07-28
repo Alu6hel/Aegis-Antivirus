@@ -1,8 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     const threatCountEl = document.getElementById('threat-count');
     const logContainer = document.getElementById('log-container');
+    const engineStatusEl = document.getElementById('engine-status');
+    
+    // New UI Elements
+    const btnQuickScan = document.getElementById('btn-quick-scan');
+    const btnFullScan = document.getElementById('btn-full-scan');
+    const btnStopScan = document.getElementById('btn-stop-scan');
+    const toggleRealtime = document.getElementById('toggle-realtime');
     
     let threatsBlocked = 0;
+    let isScanning = true;
+    let realtimeProtection = true;
     
     const scanPaths = [
         "C:\\Windows\\System32\\ntoskrnl.exe",
@@ -30,37 +39,96 @@ document.addEventListener('DOMContentLoaded', () => {
         
         logContainer.prepend(logEntry);
         
-        // Keep log from growing forever
         if (logContainer.children.length > 50) {
             logContainer.removeChild(logContainer.lastChild);
         }
     }
 
+    function startScan(type) {
+        isScanning = true;
+        btnStopScan.disabled = false;
+        engineStatusEl.textContent = "SCANNING";
+        engineStatusEl.className = "value safe-text";
+        addLog(`=== Started ${type} ===`);
+    }
+
+    function stopScan() {
+        isScanning = false;
+        btnStopScan.disabled = true;
+        engineStatusEl.textContent = realtimeProtection ? "ACTIVE" : "STANDBY";
+        engineStatusEl.className = realtimeProtection ? "value safe-text" : "value";
+        addLog("=== Scan Stopped ===");
+    }
+
+    // Event Listeners
+    btnQuickScan.addEventListener('click', () => startScan('Quick Scan'));
+    btnFullScan.addEventListener('click', () => startScan('Full Scan'));
+    btnStopScan.addEventListener('click', stopScan);
+    
+    toggleRealtime.addEventListener('change', (e) => {
+        realtimeProtection = e.target.checked;
+        if (realtimeProtection) {
+            addLog("System Shield: Real-Time Protection ENABLED");
+            if (!isScanning) engineStatusEl.textContent = "ACTIVE";
+            document.querySelector('.status-indicator').innerHTML = '<span class="dot"></span> SYSTEM SECURE';
+            document.querySelector('.status-indicator').style.background = 'rgba(46, 204, 113, 0.1)';
+            document.querySelector('.status-indicator').style.color = 'var(--safe)';
+        } else {
+            addLog("System Shield: Real-Time Protection DISABLED", true);
+            if (!isScanning) engineStatusEl.textContent = "STANDBY";
+            document.querySelector('.status-indicator').innerHTML = '⚠ PROTECTION DISABLED';
+            document.querySelector('.status-indicator').style.background = 'rgba(255, 75, 75, 0.1)';
+            document.querySelector('.status-indicator').style.color = 'var(--danger)';
+        }
+    });
+
     // Simulate Live Memory Scanning
     setInterval(() => {
+        if (!isScanning) return;
         const randomPath = scanPaths[Math.floor(Math.random() * scanPaths.length)];
         addLog(`Scanning: ${randomPath} - SECURE`);
     }, 1200);
 
-    // Simulate Intercepting a Threat occasionally
+    // Live Telemetry from Kybalion DB via Daemon API
     setInterval(() => {
-        addLog("CRITICAL: Polymorphic payload detected in memory! (dummy_virus.exe)", true);
-        addLog("ACTION: Payload neutralized via Z3 Bounds Enforcement.", true);
-        threatsBlocked++;
-        threatCountEl.textContent = threatsBlocked;
-    }, 8500);
-
-    // Try to fetch real status from local json (if daemon actually runs and drops it)
-    setInterval(() => {
-        fetch('aegis_status.json')
-            .then(response => response.ok ? response.json() : null)
+        if (!realtimeProtection && !isScanning) return;
+        
+        fetch('http://127.0.0.1:8080/api/telemetry')
+            .then(res => res.json())
             .then(data => {
-                if (data && data.status === "THREAT_NEUTRALIZED") {
-                    addLog("NATIVE INTERCEPT: Real malware blocked by Aegis Daemon!", true);
-                    threatsBlocked++;
-                    threatCountEl.textContent = threatsBlocked;
-                    fetch('aegis_status.json', { method: 'DELETE' }).catch(() => {});
+                if (data.recent_threats && data.recent_threats.length > 0) {
+                    data.recent_threats.forEach(threat => {
+                        addLog(`CRITICAL NATIVE INTERCEPT: ${threat.type} (PID: ${threat.pid})`, true);
+                        addLog(`ACTION: ${threat.action} via Z3 Bounds Enforcement.`, true);
+                        threatsBlocked++;
+                        threatCountEl.textContent = threatsBlocked;
+                    });
                 }
-            }).catch(() => {});
+            })
+            .catch(err => {
+                // Daemon might not be running locally in this mock setup
+                // addLog("Daemon disconnected. Trying to reconnect...", true);
+            });
     }, 2000);
+    // Modal Logic
+    const quarantineModal = document.getElementById('quarantine-modal');
+    const settingsModal = document.getElementById('settings-modal');
+    
+    document.getElementById('nav-quarantine').addEventListener('click', (e) => {
+        e.preventDefault();
+        quarantineModal.style.display = 'block';
+    });
+    
+    document.getElementById('nav-settings').addEventListener('click', (e) => {
+        e.preventDefault();
+        settingsModal.style.display = 'block';
+    });
+    
+    document.getElementById('btn-close-quarantine').addEventListener('click', () => {
+        quarantineModal.style.display = 'none';
+    });
+    
+    document.getElementById('btn-close-settings').addEventListener('click', () => {
+        settingsModal.style.display = 'none';
+    });
 });

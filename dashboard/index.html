@@ -16,9 +16,9 @@
                 <h1>AEGIS</h1>
             </div>
             <nav>
-                <a href="#" class="active"><span class="icon">⊞</span> Dashboard</a>
-                <a href="#"><span class="icon">⚡</span> Quarantine</a>
-                <a href="#"><span class="icon">⚙</span> Settings</a>
+                <a href="#" id="nav-dashboard" class="active"><span class="icon">⊞</span> Dashboard</a>
+                <a href="#" id="nav-quarantine"><span class="icon">⚡</span> Quarantine</a>
+                <a href="#" id="nav-settings"><span class="icon">⚙</span> Settings</a>
             </nav>
             <div class="status-indicator safe">
                 <span class="dot"></span>
@@ -44,14 +44,70 @@
                 </div>
                 <div class="stat-card glass-panel">
                     <h3>Engine Status</h3>
-                    <div class="value safe-text">ACTIVE</div>
+                    <div class="value safe-text" id="engine-status">ACTIVE</div>
                 </div>
             </div>
+
+            <section class="action-panel glass-panel">
+                <h3>Command Center</h3>
+                <div class="action-controls">
+                    <button id="btn-quick-scan" class="btn btn-primary">Quick Scan</button>
+                    <button id="btn-full-scan" class="btn btn-secondary">Full Scan</button>
+                    <button id="btn-stop-scan" class="btn btn-danger" disabled>Stop Scan</button>
+                    
+                    <div class="toggle-container">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-realtime" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">Real-Time Protection</span>
+                    </div>
+                </div>
+            </section>
 
             <section class="threat-matrix glass-panel">
                 <h3>Threat Matrix Log</h3>
                 <div class="log-container" id="log-container">
                     <!-- Logs injected via JS -->
+                </div>
+            </section>
+            
+            <!-- Quarantine Manager Modal (Hidden by default) -->
+            <section id="quarantine-modal" class="glass-panel" style="display: none; position: absolute; top: 10%; left: 25%; width: 50%; height: 80%; z-index: 100;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h3>Quarantine Vault</h3>
+                    <button id="btn-close-quarantine" class="btn btn-secondary">Close</button>
+                </div>
+                <div style="padding: 20px;">
+                    <p style="color: #8b8f94; margin-bottom: 15px;">Isolated Threats (Z3 Neutralized):</p>
+                    <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; border-left: 4px solid var(--danger); margin-bottom: 10px;">
+                        <strong>dummy_virus.exe</strong> - <em>Polymorphic Ransomware</em>
+                        <br><span style="font-size: 12px; color: var(--danger);">Action: Deleted from Memory</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Modal (Hidden by default) -->
+            <section id="settings-modal" class="glass-panel" style="display: none; position: absolute; top: 20%; left: 30%; width: 40%; height: 60%; z-index: 100;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <h3>Engine Settings</h3>
+                    <button id="btn-close-settings" class="btn btn-secondary">Close</button>
+                </div>
+                <div style="padding: 20px; display: flex; flex-direction: column; gap: 20px;">
+                    <div class="toggle-container" style="justify-content: space-between; width: 100%;">
+                        <span class="toggle-label">Z3 Heuristics Sensitivity</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="toggle-container" style="justify-content: space-between; width: 100%;">
+                        <span class="toggle-label">Swarm Cloud Telemetry</span>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
                 </div>
             </section>
         </main>

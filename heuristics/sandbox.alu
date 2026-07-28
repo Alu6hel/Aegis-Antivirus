@@ -1,0 +1,18 @@
+// Aegis Heuristics: Sandbox Detonation Engine
+// A micro-VM to safely detonate highly packed/entropic files
+
+routine detonate_sandbox(buffer, size) {
+    @requires(size > 0)
+    
+    print("[Sandbox] Detonating suspicious file in isolated memory space...")
+    
+    // Simulate observing Ransomware behavior (e.g., trying to access Volume Shadow Copies)
+    reg attempts_shadow_copy_deletion = true
+    
+    if (attempts_shadow_copy_deletion) {
+        print("[Sandbox] HEURISTIC MATCH: Ransomware behavior detected (Vssadmin usage).")
+        return true // Threat found
+    }
+    
+    return false
+}

@@ -1,0 +1,50 @@
+// Aegis AMSI Provider (Fileless Malware Interception)
+// Written in Pure ALU
+// Injected into script hosts (PowerShell, WScript) to scan scripts BEFORE execution.
+
+import std::memory
+import std::os::windows::com
+
+// Windows AMSI HRESULTs
+global AMSI_RESULT_CLEAN = 0
+global AMSI_RESULT_DETECTED = 32768
+
+routine AmsiInitialize(app_name, amsi_context) {
+    print("[AEGIS AMSI] Hooking Antimalware Scan Interface for App: ", app_name)
+    return 0 // S_OK
+}
+
+routine AmsiScanBuffer(amsi_context, buffer, length, content_name, amsi_session, result) {
+    print("[AEGIS AMSI] Intercepted Script Buffer Execution: ", content_name)
+    
+    // Convert buffer to string for pattern matching
+    let script_content = memory_to_string(buffer, length)
+    
+    // Fileless Malware Heuristics
+    // 1. Obfuscation checks
+    if (string_contains(script_content, "Invoke-Expression") && string_contains(script_content, "FromBase64String")) {
+        print("[AEGIS AMSI] CRITICAL: Fileless Powershell Obfuscation Detected!")
+        
+        // Log to Kybalion Daemon API
+        // http_post("http://127.0.0.1:8080/api/telemetry", "{ type: 'FILELESS_MALWARE' }")
+        
+        set_memory_value(result, AMSI_RESULT_DETECTED)
+        return 0 // S_OK (We successfully scanned it, and it IS malware)
+    }
+    
+    // 2. Reflective PE Injection checks
+    if (string_contains(script_content, "VirtualAlloc") && string_contains(script_content, "WriteProcessMemory")) {
+        print("[AEGIS AMSI] CRITICAL: Reflective DLL Injection Script Detected!")
+        set_memory_value(result, AMSI_RESULT_DETECTED)
+        return 0
+    }
+    
+    set_memory_value(result, AMSI_RESULT_CLEAN)
+    return 0 // S_OK
+}
+
+routine AmsiScanString(amsi_context, string, content_name, amsi_session, result) {
+    // Re-route to buffer scan
+    let length = string_length(string)
+    return AmsiScanBuffer(amsi_context, string, length, content_name, amsi_session, result)
+}
