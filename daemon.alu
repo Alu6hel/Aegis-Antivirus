@@ -13,6 +13,8 @@ import heuristics::entropy
 import heuristics::yara
 import heuristics::sandbox
 
+import ui::hologram // The Holographic Radar UI
+
 global kybalion_fd = 0
 global P2P_NETWORK_CONSENT_GRANTED = false // GDPR/Privacy: User must explicitly opt-in via UI
 
@@ -97,27 +99,7 @@ routine local_heuristics_scan(pid, filepath: ptr<u8>) {
     return true
 }
 
-// Dedicated thread for serving the local Aegis Dashboard UI
-routine dashboard_api_server() {
-    let server = tcp_bind("127.0.0.1", 8080)
-    print("[Aegis API] Local UI Dashboard API spinning up on port 8080...")
-    
-    while (true) {
-        let client = tcp_accept(server)
-        let request = tcp_read(client)
-        
-        if (string_contains(request, "GET /api/telemetry")) {
-            // Query Kybalion DB using the new B-Tree index for recent threats
-            let recent_threats = db_query(kybalion_fd, "LATEST_THREATS", false)
-            
-            let json_response = "{ \"status\": \"SECURE\", \"recent_threats\": " + recent_threats + " }"
-            
-            let http_resp = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nAccess-Control-Allow-Origin: *\r\n\r\n" + json_response
-            tcp_write(client, http_resp)
-        }
-        tcp_close(client)
-    }
-}
+// Legacy HTML/JS Web server removed in favor of Holographic Radar
 
 routine deploy_honeypots() {
     print("[Aegis Daemon] Deploying Decoy Honeypot Files...")
@@ -143,8 +125,8 @@ routine main() {
     // Initialize High-Speed Kybalion Database (Encrypted, MVCC)
     kybalion_fd = db_init_timeseries("C:\\Aegis\\")
     
-    // Start local API server for the UI in a background thread
-    thread_spawn(dashboard_api_server)
+    // Boot The Holographic Radar Interface (3D GPU Window)
+    ui::hologram::boot_holographic_radar()
     
     deploy_honeypots()
     
