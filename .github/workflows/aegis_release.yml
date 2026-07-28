@@ -24,7 +24,15 @@ jobs:
       - name: Compile Aegis Windows GUI & Metadata
         run: |
           windres aegis_metadata.rc -o aegis_metadata.res
-          g++ daemon.cpp aegis_metadata.res -o aegis_production.exe -O3 -mwindows
+          g++ daemon.cpp aegis_metadata.res -o aegis_production.exe -O3 -mwindows -lgdi32 -lshell32
+
+      - name: Authenticode Code Signing (Prototype)
+        run: |
+          # 1. Generate a self-signed prototype certificate for Alugandr Co.
+          $cert = New-SelfSignedCertificate -Subject "CN=Alugandr Co." -Type CodeSigningCert -CertStoreLocation "Cert:\CurrentUser\My"
+          
+          # 2. Cryptographically sign the Aegis executable
+          Set-AuthenticodeSignature -FilePath "aegis_production.exe" -Certificate $cert -TimestampServer "http://timestamp.digicert.com"
 
       - name: Update GitHub Release
         env:

@@ -1,12 +1,48 @@
 #define UNICODE
 #define _UNICODE
 #include <windows.h>
+#include <shellapi.h>
 #include <string>
+
+#define WM_TRAYICON (WM_USER + 1)
+
+NOTIFYICONDATA nid = {};
+
+void AddTrayIcon(HWND hwnd) {
+    nid.cbSize = sizeof(NOTIFYICONDATA);
+    nid.hWnd = hwnd;
+    nid.uID = 1001;
+    nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
+    nid.uCallbackMessage = WM_TRAYICON;
+    nid.hIcon = LoadIcon(NULL, IDI_SHIELD);
+    lstrcpy(nid.szTip, L"Aegis Antivirus (Running)");
+    Shell_NotifyIcon(NIM_ADD, &nid);
+}
+
+void RemoveTrayIcon() {
+    Shell_NotifyIcon(NIM_DELETE, &nid);
+}
 
 // Window Procedure to handle OS events
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     switch (uMsg) {
+        case WM_CREATE:
+            AddTrayIcon(hwnd);
+            return 0;
+        case WM_SIZE:
+            if (wParam == SIZE_MINIMIZED) {
+                ShowWindow(hwnd, SW_HIDE);
+                return 0;
+            }
+            break;
+        case WM_TRAYICON:
+            if (lParam == WM_LBUTTONUP || lParam == WM_RBUTTONUP) {
+                ShowWindow(hwnd, SW_RESTORE);
+                SetForegroundWindow(hwnd);
+            }
+            return 0;
         case WM_DESTROY:
+            RemoveTrayIcon();
             PostQuitMessage(0);
             return 0;
         case WM_PAINT: {
